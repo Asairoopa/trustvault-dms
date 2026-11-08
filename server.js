@@ -13,21 +13,17 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Serve static frontend files safely
+// Serve static frontend files safely from backend/public
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, '../public')));
 
 // Explicit root route handler to completely prevent "Cannot GET /" error
 app.get('/', (req, res) => {
-  const targetPath = path.join(__dirname, '../public/index.html');
   const localPath = path.join(__dirname, 'public/index.html');
   
-  if (fs.existsSync(targetPath)) {
-    res.sendFile(targetPath);
-  } else if (fs.existsSync(localPath)) {
+  if (fs.existsSync(localPath)) {
     res.sendFile(localPath);
   } else {
-    res.status(404).send('Error: index.html file not found!');
+    res.status(404).send('Error: index.html file not found in backend/public!');
   }
 });
 
@@ -58,7 +54,6 @@ app.post('/api/auth/login', (req, res) => {
     const validPassword = bcrypt.compareSync(password, user.password);
     if (!validPassword) return res.status(401).json({ error: 'Invalid email or password' });
 
-    // Removed expiresIn so the token never expires unexpectedly
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET);
     res.json({ token, role: user.role, email: user.email, userId: user.id });
   });
