@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustVault Secure DMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Top Navigation -->
+    <header class="bg-indigo-900 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wide">🛡️ TrustVault Secure DMS</h1>
+            <div id="user-info" class="hidden flex items-center space-x-4">
+                <span id="user-badge" class="bg-indigo-700 px-3 py-1 rounded-full text-sm font-semibold"></span>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded text-sm transition font-medium">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
+        
+        <!-- LOGIN SECTION -->
+        <section id="login-section" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border border-slate-100 mt-10">
+            <h2 class="text-2xl font-bold mb-6 text-center text-indigo-900">Sign In to TrustVault</h2>
+            
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                    <input type="email" id="email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" id="password" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition shadow">Login</button>
+            </form>
+
+            <div class="mt-8 border-t pt-6">
+                <p class="text-xs text-center text-slate-500 mb-3 font-semibold uppercase tracking-wider">Quick Testing Logins</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="quickLogin('admin@trustvault.com', 'Password123!')" class="bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 text-xs py-2 rounded font-medium transition">👑 Admin</button>
+                    <button onclick="quickLogin('owner@trustvault.com', 'Password123!')" class="bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 text-xs py-2 rounded font-medium transition">✍️ Owner</button>
+                    <button onclick="quickLogin('viewer@trustvault.com', 'Password123!')" class="bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 text-xs py-2 rounded font-medium transition">👁️ Viewer</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboard-section" class="hidden space-y-8">
+            
+            <!-- Admin Navigation Tabs -->
+            <div id="admin-tabs" class="hidden flex space-x-2 border-b pb-4">
+                <button onclick="switchTab('docs')" id="tab-docs" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">📁 Documents Management</button>
+                <button onclick="switchTab('logs')" id="tab-logs" class="bg-slate-200 text-slate-700 hover:bg-slate-300 px-4 py-2 rounded-lg text-sm font-semibold transition">📜 Audit Logs</button>
+            </div>
+
+            <!-- DOCUMENTS TAB CONTENT -->
+            <div id="content-docs" class="space-y-8">
+                <!-- Upload Box -->
+                <div id="upload-card" class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">📁 Upload Secure Document</h3>
+                    <form id="upload-form" onsubmit="uploadDocument(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Document Title</label>
+                            <input type="text" id="doc-title" placeholder="e.g. Financial Report Q3" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Category</label>
+                            <select id="doc-category" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                                <option value="Finance">Finance</option>
+                                <option value="Legal">Legal</option>
+                                <option value="HR">HR</option>
+                                <option value="General">General</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="file" id="doc-file" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-lg text-sm transition">Upload</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Documents List -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-800">📂 Accessible Documents</h3>
+                        <button onclick="loadDocuments()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded transition">Refresh List</button>
+                    </div>
+                    <div id="documents-container" class="overflow-x-auto">
+                        <p class="text-slate-500 text-sm italic">Loading documents...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUDIT LOGS TAB CONTENT -->
+            <div id="content-logs" class="hidden bg-white p-6 rounded-xl shadow-md border border-slate-100 space-y-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">📜 System Audit Logs (Admin View)</h3>
+                    <button onclick="loadAuditLogs()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded transition">Refresh Logs</button>
+                </div>
+                <div id="logs-container" class="overflow-x-auto">
+                    <p class="text-slate-500 text-sm italic">Loading audit logs...</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                showDashboard();
+            }
+        });
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('email', data.email);
+                    showDashboard();
+                } else {
+                    alert(data.error || 'Login failed');
+                }
+            } catch (err) {
+                alert('Connection error with server');
+            }
+        }
+
+        function quickLogin(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+            handleLogin(new Event('submit'));
+        }
+
+        function logout() {
+            localStorage.clear();
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            document.getElementById('admin-tabs').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            
+            const email = localStorage.getItem('email');
+            const role = localStorage.getItem('role');
+            document.getElementById('user-badge').innerText = `${email} (${role})`;
+
+            if (role === 'ADMIN') {
+                document.getElementById('admin-tabs').classList.remove('hidden');
+            } else {
+                document.getElementById('admin-tabs').classList.add('hidden');
+            }
+
+            if (role === 'VIEWER') {
+                document.getElementById('upload-card').classList.add('hidden');
+            } else {
+                document.getElementById('upload-card').classList.remove('hidden');
+            }
+
+            switchTab('docs');
+        }
+
+        function switchTab(tab) {
+            const docsTab = document.getElementById('tab-docs');
+            const logsTab = document.getElementById('tab-logs');
+            const docsContent = document.getElementById('content-docs');
+            const logsContent = document.getElementById('content-logs');
+
+            if (tab === 'docs') {
+                docsTab.className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition";
+                logsTab.className = "bg-slate-200 text-slate-700 hover:bg-slate-300 px-4 py-2 rounded-lg text-sm font-semibold transition";
+                docsContent.classList.remove('hidden');
+                logsContent.classList.add('hidden');
+                loadDocuments();
+            } else {
+                logsTab.className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition";
+                docsTab.className = "bg-slate-200 text-slate-700 hover:bg-slate-300 px-4 py-2 rounded-lg text-sm font-semibold transition";
+                logsContent.classList.remove('hidden');
+                docsContent.classList.add('hidden');
+                loadAuditLogs();
+            }
+        }
+
+        async function loadDocuments() {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/documents`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const docs = await res.json();
+                
+                const container = document.getElementById('documents-container');
+                if (!res.ok || !Array.isArray(docs) || docs.length === 0) {
+                    container.innerHTML = `<p class="text-slate-400 text-sm italic">No documents found. Upload one to get started!</p>`;
+                    return;
+                }
+
+                let html = `
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b text-xs text-slate-500 uppercase">
+                                <th class="py-3 px-4">Title</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Owner</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm">
+                `;
+
+                const currentRole = localStorage.getItem('role');
+                const currentUserEmail = localStorage.getItem('email');
+
+                docs.forEach(doc => {
+                    const canDelete = (currentRole === 'ADMIN' || doc.owner_email === currentUserEmail);
+
+                    html += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-medium text-slate-800">${doc.title || doc.filename}</td>
+                            <td class="py-3 px-4"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs">${doc.category || 'General'}</span></td>
+                            <td class="py-3 px-4 text-slate-500">${doc.owner_email || 'Unknown'}</td>
+                            <td class="py-3 px-4 text-right space-x-3">
+                                <button onclick="downloadDoc(${doc.id}, '${doc.filename}')" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1 rounded text-xs font-semibold cursor-pointer">Download</button>
+                                ${canDelete ? `<button onclick="deleteDoc(${doc.id})" class="bg-red-50 text-red-700 hover:bg-red-100 px-3 py-1 rounded text-xs font-semibold cursor-pointer">Delete</button>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            } catch (err) {
+                console.error(err);
+                document.getElementById('documents-container').innerHTML = `<p class="text-red-500 text-sm">Failed to load documents.</p>`;
+            }
+        }
+
+        async function loadAuditLogs() {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/admin/audit-logs`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const logs = await res.json();
+                
+                const container = document.getElementById('logs-container');
+                if (!res.ok || !Array.isArray(logs) || logs.length === 0) {
+                    container.innerHTML = `<p class="text-slate-400 text-sm italic">No audit logs recorded yet.</p>`;
+                    return;
+                }
+
+                let html = `
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b text-xs text-slate-500 uppercase">
+                                <th class="py-3 px-4">Actor</th>
+                                <th class="py-3 px-4">Action</th>
+                                <th class="py-3 px-4">Target ID</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm">
+                `;
+
+                logs.forEach(log => {
+                    const actionColor = log.action === 'UPLOAD' ? 'bg-green-100 text-green-700' : (log.action === 'DELETE' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700');
+                    html += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-medium text-slate-800">${log.actor_email || 'System'}</td>
+                            <td class="py-3 px-4"><span class="${actionColor} px-2 py-0.5 rounded text-xs font-semibold">${log.action}</span></td>
+                            <td class="py-3 px-4 text-slate-600">Doc #${log.target_id || 'N/A'}</td>
+                            <td class="py-3 px-4 text-slate-600">${log.status}</td>
+                            <td class="py-3 px-4 text-slate-400 text-xs">${log.timestamp}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            } catch (err) {
+                console.error(err);
+                document.getElementById('logs-container').innerHTML = `<p class="text-red-500 text-sm">Failed to load audit logs.</p>`;
+            }
+        }
+
+        async function uploadDocument(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('title', document.getElementById('doc-title').value);
+            formData.append('category', document.getElementById('doc-category').value);
+            formData.append('file', document.getElementById('doc-file').files[0]);
+
+            const res = await fetch(`${API_URL}/documents/upload`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                alert('Document uploaded successfully!');
+                document.getElementById('upload-form').reset();
+                loadDocuments();
+            } else {
+                alert(data.error || 'Upload failed');
+            }
+        }
+
+        async function downloadDoc(id, filename) {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/documents/${id}/download`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    alert('Failed to download file');
+                }
+            } catch (e) {
+                alert('Download error occurred');
+            }
+        }
+
+        async function deleteDoc(id) {
+            if (!confirm('Are you sure you want to delete this document?')) return;
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/documents/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    alert('Document deleted successfully');
+                    loadDocuments();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to delete document');
+                }
+            } catch (e) {
+                alert('Delete error occurred');
+            }
+        }
+    </script>
+</body>
+</html>
