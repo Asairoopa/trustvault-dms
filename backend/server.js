@@ -45,7 +45,7 @@ setTimeout(() => {
   console.log('✅ Default Users Seeded: Admin, Owner, Viewer');
 }, 1000);
 
-// AUTH LOGIN (Token without expiration to avoid invalid/expired token errors)
+// AUTH LOGIN
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
   db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
@@ -117,7 +117,7 @@ app.get('/api/documents/:id/download', authenticateToken, (req, res) => {
   });
 });
 
-// DELETE DOCUMENT (Admin & Owner Delete Support)
+// DELETE DOCUMENT
 app.delete('/api/documents/:id', authenticateToken, (req, res) => {
   const docId = req.params.id;
   db.get(`SELECT * FROM documents WHERE id = ?`, [docId], (err, doc) => {
