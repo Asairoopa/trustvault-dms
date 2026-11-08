@@ -1,4 +1,17 @@
+# Dependencies
 node_modules/
+jspm_packages/
+
+# Build outputs
 build/
 dist/
+out/
+*.unitypackage
+
+# Logs and databases
 *.log
+*.sqlite
+*.sqlite-db
+*.sqlite3
+.env
+.env.local edhi undhi
